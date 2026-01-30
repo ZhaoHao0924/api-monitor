@@ -23,15 +23,7 @@ on:
         required: false
         type: boolean
         default: false
-
-  # 推送到main分支时也运行（可选）
-  push:
-    branches: [ main ]
-  
-  # 创建pull request时运行（可选）
-  pull_request:
-    branches: [ main ]
-
+        
 jobs:
   monitor:
     runs-on: ubuntu-latest
