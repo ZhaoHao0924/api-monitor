@@ -1,0 +1,70 @@
+name: API Monitor
+
+on:
+  # 定时触发（UTC时间）
+  schedule:
+    # 每6小时运行一次
+    - cron: '0 0 * * *'
+    
+    # 其他示例cron表达式：
+    # - cron: '0 0 * * *'      # 每天UTC午夜
+    # - cron: '0 8 * * *'      # 每天UTC 8点（北京时间16点）
+    # - cron: '*/30 * * * *'   # 每30分钟
+    
+  # 允许手动触发
+  workflow_dispatch:
+    inputs:
+      endpoints:
+        description: '要测试的端点（逗号分隔，留空为全部）'
+        required: false
+        default: ''
+      verbose:
+        description: '详细输出'
+        required: false
+        type: boolean
+        default: false
+
+  # 推送到main分支时也运行（可选）
+  push:
+    branches: [ main ]
+  
+  # 创建pull request时运行（可选）
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v3
+      
+    - name: ⎔ 设置Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 📦 安装依赖
+      run: npm ci
+      
+    - name: 🚀 运行API监控
+      id: monitor
+      env:
+        # 可以在这里添加环境变量（如API密钥）
+        # API_KEY: ${{ secrets.API_KEY }}
+        NODE_ENV: production
+      run: |
+        echo "开始运行API监控..."
+        node src/index.js
+        echo "监控完成！"
+        
+    - name: 📊 保存测试结果
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: api-monitor-results
+        path: |
+          logs/
+        retention-days: 7
