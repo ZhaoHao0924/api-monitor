@@ -10,14 +10,23 @@ const apiEndpoints = [
     timeout: 5000
   },
   {
-    name: "memos API",
+    name: "wxpush API",
     url: "https://zhhyt568972743-wxpush.hf.space/",
     method: "GET",
     headers: {
       "User-Agent": "API-Monitor"
     },
     timeout: 5000
-  }
+  },
+  {
+    name: "kvideo API",
+    url: "https://zhhyt568972743-kvideo.hf.space/",
+    method: "GET",
+    headers: {
+      "User-Agent": "API-Monitor"
+    },
+    timeout: 5000
+  },
 ];
 
 // 请求配置
