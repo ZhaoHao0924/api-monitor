@@ -27,6 +27,15 @@ const apiEndpoints = [
     },
     timeout: 5000
   },
+  {
+    name: "qinglong API",
+    url: "https://zhhyt568972743-qinglong.hf.space/",
+    method: "GET",
+    headers: {
+      "User-Agent": "API-Monitor"
+    },
+    timeout: 5000
+  }
 ];
 
 // 请求配置
