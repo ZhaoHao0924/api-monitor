@@ -1,5 +1,6 @@
 const axios = require('axios');
 const logger = require('./utils/logger');
+const { sendEmail } = require('./utils/mailUtils');
 const { apiEndpoints, config } = require('./config');
 
 class APIMonitor {
@@ -84,7 +85,7 @@ class APIMonitor {
 
   generateReport() {
     const successful = this.results.filter(r => r.success).length;
-    const failed = this.results.filter(r => !r.success).length;
+    const failed = this.results.filter(r => r.success === false).length;
     const totalTime = this.results.reduce((sum, r) => {
       const time = parseInt(r.responseTime) || 0;
       return sum + time;
@@ -104,6 +105,31 @@ class APIMonitor {
       const emoji = result.success ? '✅' : '❌';
       logger.info(`${emoji} ${result.name}: ${result.status} - ${result.responseTime}`);
     });
+
+    // 有失败时发送邮件通知
+    if (failed > 0) {
+      this.sendAlert(failed, successful);
+    }
+  }
+
+  async sendAlert(failedCount, successCount) {
+    const failedEndpoints = this.results.filter(r => !r.success);
+    const failedNames = failedEndpoints.map(r => `- ${r.name}: ${r.statusText}`).join('\n');
+    
+    const subject = `⚠️ API监控告警 - ${failedCount}个端点失败`;
+    const text = `API Monitor 检测报告\n\n总计: ${this.results.length}\n成功: ${successCount}\n失败: ${failedCount}\n\n失败的端点:\n${failedNames}\n\n时间: ${new Date().toISOString()}`;
+    const html = `<h2>⚠️ API监控告警</h2><p>总计: ${this.results.length} | 成功: ${successCount} | <strong style="color:red">失败: ${failedCount}</strong></p><h3>失败的端点:</h3><ul>${failedEndpoints.map(r => `<li><strong>${r.name}</strong>: ${r.statusText}</li>`).join('')}</ul><p style="color:#888">时间: ${new Date().toISOString()}</p>`;
+
+    try {
+      await sendEmail({
+        to: process.env.NOTIFY_EMAIL || '568972743@qq.com',
+        subject,
+        text,
+        html
+      });
+    } catch (e) {
+      logger.error('邮件发送失败:', e.message);
+    }
   }
 }
 

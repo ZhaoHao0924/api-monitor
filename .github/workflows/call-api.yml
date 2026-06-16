@@ -1,14 +1,15 @@
 name: API Monitor
 
 on:
-  # 定时触发（UTC时间）
+  # 定时触发（UTC时间，北京时间+8）
   schedule:
-    # 每6小时运行一次
+    # 每天北京时间 8:00 和 20:00 各运行一次
     - cron: '0 0 * * *'
+    - cron: '0 12 * * *'
     
     # 其他示例cron表达式：
-    # - cron: '0 0 * * *'      # 每天UTC午夜
-    # - cron: '0 8 * * *'      # 每天UTC 8点（北京时间16点）
+    # - cron: '0 0 * * *'      # 每天UTC午夜（北京8点）
+    # - cron: '0 12 * * *'     # 每天UTC 12点（北京20点）
     # - cron: '*/30 * * * *'   # 每30分钟
     
   # 允许手动触发
@@ -44,8 +45,9 @@ jobs:
     - name: 🚀 运行API监控
       id: monitor
       env:
-        # 可以在这里添加环境变量（如API密钥）
-        # API_KEY: ${{ secrets.API_KEY }}
+        SMTP_USER: ${{ secrets.SMTP_USER }}
+        SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
         NODE_ENV: production
       run: |
         echo "开始运行API监控..."
