@@ -1,21 +1,15 @@
-name: API Monitor & HF Space Keep-Alive
+name: HF Space Keep-Alive
 
 on:
-  # 每30分钟运行一次（保活 + 监控 + 告警）
+  # 每天北京时间 8:00 保活一次
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '0 0 * * *'
     
   # 允许手动触发
   workflow_dispatch:
-    inputs:
-      verbose:
-        description: '详细输出'
-        required: false
-        type: boolean
-        default: false
 
 jobs:
-  monitor:
+  keep-alive:
     runs-on: ubuntu-latest
     
     steps:
@@ -31,22 +25,22 @@ jobs:
     - name: 📦 安装依赖
       run: npm ci
       
-    - name: 🚀 运行API监控 + HF Space保活
+    - name: 🚀 保活 HF Space
       env:
         SMTP_USER: ${{ secrets.SMTP_USER }}
         SMTP_PASS: ${{ secrets.SMTP_PASS }}
         NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
         NODE_ENV: production
       run: |
-        echo "🚀 开始运行API监控 + HF Space保活..."
+        echo "🚀 开始保活 OpenClaw HF Space..."
         node src/index.js
-        echo "✅ 监控完成！"
+        echo "✅ 保活完成！"
         
-    - name: 📊 保存测试结果
+    - name: 📊 保存日志
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: monitor-results
+        name: keepalive-log
         path: |
           logs/
         retention-days: 7
