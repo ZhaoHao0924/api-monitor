@@ -2,7 +2,7 @@
 const apiEndpoints = [
   {
     name: "OpenClaw Space",
-    url: "https://zh568972743-openclaw.hf.space/health",
+    url: "https://zh568972743-openclaw.hf.space",
     method: "GET",
     headers: { "User-Agent": "API-Monitor" },
     timeout: 10000
